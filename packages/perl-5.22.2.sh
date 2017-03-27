@@ -8,7 +8,7 @@ pkg_info() {
 }
 
 pkg_build() {
-	./configure -Dprefix=${PREFIX} \
+	./Configure -Dprefix=${PREFIX} \
 		-des \
 		-Duse64bital \
 		-Duseshrplib \

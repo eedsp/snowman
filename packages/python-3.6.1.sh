@@ -8,8 +8,26 @@ pkg_info() {
 }
 
 pkg_build() {
-	export CFLAGS="-I/usr/local/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libffi/include"
-	export LDFLAGS="-L/usr/local/lib -L/usr/local/opt/openssl/lib -L/usr/local/opt/libffi/lib"
+
+	if [ -e "/usr/local/opt/openssl/lib/pkgconfig" ]; then
+		PKG_CONFIG_PATH=/usr/local/opt/openssl/lib/pkgconfig:${PKG_CONFIG_PATH}
+	elif [ -e "${PKG_INSTALL_PATH}/openssl/lib/pkgconfig" ]; then
+		PKG_CONFIG_PATH=${PKG_INSTALL_PATH}/openssl/lib/pkgconfig:${PKG_CONFIG_PATH}
+	fi
+	if [ -e "/usr/local/opt/libffi/lib/pkgconfig" ]; then
+		PKG_CONFIG_PATH=/usr/local/opt/libffi/lib/pkgconfig:${PKG_CONFIG_PATH}
+	elif [ -e "${PKG_INSTALL_PATH}/libffi/lib/pkgconfig" ]; then
+		PKG_CONFIG_PATH=${PKG_INSTALL_PATH}/libffi/lib/pkgconfig:${PKG_CONFIG_PATH}
+	fi
+
+    openssl_CFLAGS=$(pkg-config --cflags openssl)
+    openssl_LIBS=$(pkg-config --libs openssl)
+
+    libffi_CFLAGS=$(pkg-config --cflags libffi)
+    libffi_LIBS=$(pkg-config --libs libffi)
+
+	export CFLAGS="-I/usr/local/include ${openssl_CFLAGS} ${libffi_CFLAGS}"
+	export LDFLAGS="-L/usr/local/lib ${openssl_LIBS} ${libffi_LIBS}"
 
 	if [ ${vOS} = "Darwin" ]; then
 		MACOSX_DEPLOYMENT_TARGET=10.12
@@ -17,7 +35,6 @@ pkg_build() {
 	./configure --prefix=${PREFIX} \
 		--enable-ipv6 \
 		--enable-shared \
-		--with-dtrace \
 		--with-threads \
 		--without-gcc \
 		--without-ensurepip \

@@ -8,15 +8,34 @@ pkg_info() {
 }
 
 pkg_build() {
-	# --with-gmp=${PKG_INSTALL_PREFIX}/gmp/6.1.2 \
-	# --with-gmp=${PKG_INSTALL_PATH}/gmp \
 
-	export CFLAGS="-I/usr/local/include -I/usr/local/opt/openssl/include -I/usr/local/opt/libffi/include"
-	export LDFLAGS="-L/usr/local/lib -L/usr/local/opt/openssl/lib -L/usr/local/opt/libffi/lib"
+	if [ -e "/usr/local/opt/jemalloc/lib/pkgconfig" ]; then
+		PKG_CONFIG_PATH=/usr/local/opt/jemalloc/lib/pkgconfig:${PKG_CONFIG_PATH}
+	elif [ -e "${PKG_INSTALL_PATH}/jemalloc/lib/pkgconfig" ]; then
+		PKG_CONFIG_PATH=${PKG_INSTALL_PATH}/jemalloc/lib/pkgconfig:${PKG_CONFIG_PATH}
+	fi
+	if [ -e "/usr/local/opt/openssl/lib/pkgconfig" ]; then
+		PKG_CONFIG_PATH=/usr/local/opt/openssl/lib/pkgconfig:${PKG_CONFIG_PATH}
+	elif [ -e "${PKG_INSTALL_PATH}/openssl/lib/pkgconfig" ]; then
+		PKG_CONFIG_PATH=${PKG_INSTALL_PATH}/openssl/lib/pkgconfig:${PKG_CONFIG_PATH}
+	fi
+    jemalloc_CFLAGS=$(pkg-config --cflags jemalloc)
+    jemalloc_LIBS=$(pkg-config --libs jemalloc)
+
+    openssl_CFLAGS=$(pkg-config --cflags openssl)
+    openssl_LIBS=$(pkg-config --libs openssl)
+
+	if [ -e "/usr/local/opt/gmp" ]; then
+		WITH_GMP="--with-gmp=/usr/local/opt/gmp"
+	elif [ -e "${PKG_INSTALL_PATH}/gmp" ]; then
+		WITH_GMP="--with-gmp=${PKG_INSTALL_PATH}/gmp"
+	fi
+
+	export CFLAGS="-I/usr/local/include ${jemalloc_CFLAGS} ${openssl_CFLAGS}"
+	export LDFLAGS="-L/usr/local/lib ${jemalloc_LIBS} ${openssl_LIBS}"
 
 	./configure --prefix=${PREFIX} \
 		--enable-shared --enable-pthread \
-		--with-jemalloc \
-		--with-gmp=/usr/local/opt/gmp \
-	&& make -j 6 && make install
+		--with-jemalloc ${WITH_GMP}
+	 make -j 6 && make install
 }

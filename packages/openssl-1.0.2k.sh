@@ -13,5 +13,5 @@ pkg_build() {
 	elif [ ${vOS} = "Linux" ]; then
 	    BUILD_OPTION="shared linux-x86_64"
 	fi
-	./configure --prefix=${PREFIX} ${BUILD_OPTION} && make -j 6 && make install
+	./Configure --prefix=${PREFIX} ${BUILD_OPTION} && make -j 6 && make install
 }

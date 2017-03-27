@@ -18,22 +18,21 @@ PKG_LIST=(
 	"sqlite-3.17.0"
 
 	"hiredis-0.13.3"
-	#"cpp_redis-3.2.1"
 
-	#"jansson-2.10"
-	#"rapidjson-1.1.0"
+	"jansson-2.10"
+	"rapidjson-1.1.0"
 
-	#"libev-4.24"
-	#"libuv-1.11.0"
+	"libev-4.24"
+	"libuv-1.11.0"
 
-	#"ck-0.6.0"
-	#"mpich-3.2"
+	"ck-0.6.0"
+	"mpich-3.2"
 
-	"perl-5.22.1"
-	"python-3.6.0"
+	"perl-5.24.1"
+	"python-3.6.1"
 
 	"lua-5.3.4.sh"	
-	"ruby-2.4.0"
+	"ruby-2.4.1"
 )
 
 for vPKG in ${PKG_LIST[@]}

@@ -9,7 +9,11 @@ pkg_info() {
 }
 
 pkg_build() {
-	PKG_CONFIG_PATH=${PKG_INSTALL_PATH}/gflags/lib/pkgconfig:${PKG_CONFIG_PATH}
+	if [ -e "/usr/local/opt/gflags/lib/pkgconfig" ]; then
+		PKG_CONFIG_PATH=/usr/local/opt/gflags/lib/pkgconfig:${PKG_CONFIG_PATH}
+	elif [ -e "${PKG_INSTALL_PATH}/gflags/lib/pkgconfig" ]; then
+		PKG_CONFIG_PATH=${PKG_INSTALL_PATH}/gflags/lib/pkgconfig:${PKG_CONFIG_PATH}
+	fi
 
     gflags_CFLAGS=$(pkg-config --cflags gflags)
     gflags_LIBS=$(pkg-config --libs gflags)
