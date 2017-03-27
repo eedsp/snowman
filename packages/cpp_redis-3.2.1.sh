@@ -1,5 +1,5 @@
 pkg_info() {
-	_xDESC="Apache Runtime Library"
+	_xDESC="C++11 Lightweight Redis client: async, thread-safe, no dependency, pipelining, multi-platfor"
 
 	_xFILE="cpp_redis-3.2.1.tar.gz"
 	_xFILE_PATH=cpp_redis-3.2.1
