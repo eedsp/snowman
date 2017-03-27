@@ -11,8 +11,8 @@ pkg_info() {
 pkg_build() {
 	PKG_CONFIG_PATH=${PKG_INSTALL_PATH}/gflags/lib/pkgconfig:${PKG_CONFIG_PATH}
 
-    gflags_CFLAGS=$(pkg-config --cflags gflags)
-    gflags_LIBS=$(pkg-config --libs gflags)
+	gflags_CFLAGS=$(pkg-config --cflags gflags)
+	gflags_LIBS=$(pkg-config --libs gflags)
 
 	./configure --prefix=${PREFIX} --disable-dependency-tracking && make -j 6 && make install
 }
