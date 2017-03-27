@@ -31,3 +31,8 @@
 # Debug files
 *.dSYM/
 *.su
+
+var/*
+_BUILD/*
+??_BACKUP/*
+default.pkg.sh
