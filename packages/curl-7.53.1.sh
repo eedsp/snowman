@@ -8,14 +8,31 @@ pkg_info() {
 }
 
 pkg_build() {
+
+	for tPKG_NAME in libidn
+	do
+		for local PKGCONFIG_prefix in "/usr/local/opt" ${PKG_INSTALL_PATH}
+		do
+			tmpPATH="${PKGCONFIG_prefix}/${tPKG_NAME}/lib/pkgconfig"
+			if [ -e "${PKGCONFIG_prefix}" ]; then
+				PKG_CONFIG_PATH=${tmpPATH}:${PKG_CONFIG_PATH}
+			fi
+		done
+	done
+
+    libidn_CFLAGS=$(pkg-config --cflags libidn)
+    libidn_LIBS=$(pkg-config --libs libidn)
+
+	export CFLAGS="-I/usr/local/include ${libidn_CFLAGS}"
+	export LDFLAGS="-L/usr/local/lib ${libidn_LIBS}"
+
 	vOS=`uname -s`
 	if [ ${vOS} = "Darwin" ]; then
-			./configure --prefix=${PREFIX} \
-				--with-libidn=${PKG_INSTALL_PREFIX}/libidn/1.33 --with-darwinssl \
-			&& make -j 6 && make install
+		./configure --prefix=${PREFIX} \
+			--with-libidn --with-darwinssl 
 	elif [ ${vOS} = "Linux" ]; then
-			./configure --prefix=${PREFIX} \
-				--with-libidn=${APP_PATH} --with-ssl=${APP_PATH} \
-			&& make -j 6 && make install
+		./configure --prefix=${PREFIX} \
+			--with-libidn=${APP_PATH} --with-ssl=${APP_PATH} 
 	fi
+	make -j 6 && make install
 }
