@@ -31,8 +31,8 @@ pkg_build() {
 		WITH_GMP="--with-gmp=${PKG_INSTALL_PATH}/gmp"
 	fi
 
-	export CFLAGS="-I/usr/local/include ${jemalloc_CFLAGS} ${openssl_CFLAGS}"
-	export LDFLAGS="-L/usr/local/lib ${jemalloc_LIBS} ${openssl_LIBS}"
+	CFLAGS="-I/usr/local/include ${jemalloc_CFLAGS} ${openssl_CFLAGS}"
+	LDFLAGS="-L/usr/local/lib ${jemalloc_LIBS} ${openssl_LIBS}"
 
 	./configure --prefix=${PREFIX} \
 		--enable-shared --enable-pthread \

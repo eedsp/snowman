@@ -13,8 +13,16 @@ pkg_build() {
 	#MPI_PATH=${PKG_INSTALL_PREFIX}/mpich/3.2
 	#ICU_PATH=${PKG_INSTALL_PREFIX}/icu/58.2
 
-	MPI_PATH=${PKG_INSTALL_PATH}/mpich
-	ICU_PATH=${PKG_INSTALL_PATH}/icu
+	if [ -e "/usr/local/opt/mpich" ]; then
+		MPI_PATH=/usr/local/opt/mpich
+	elif [ -e "${PKG_INSTALL_PATH}/mpich" ]; then
+		MPI_PATH=${PKG_INSTALL_PATH}/mpich
+	fi
+	if [ -e "/usr/local/opt/icu" ]; then
+		ICU_PATH=/usr/local/opt/icu
+	elif [ -e "${PKG_INSTALL_PATH}/icu" ]; then
+		ICU_PATH=${PKG_INSTALL_PATH}/icu
+	fi
 
 	# CFLAGS="-I/usr/local/include -I${ICU_PATH}/include"
 	# LDFLAGS="-L/usr/local/lib -L${ICU_PATH}/lib"

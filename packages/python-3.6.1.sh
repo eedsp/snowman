@@ -26,8 +26,8 @@ pkg_build() {
     libffi_CFLAGS=$(pkg-config --cflags libffi)
     libffi_LIBS=$(pkg-config --libs libffi)
 
-	export CFLAGS="-I/usr/local/include ${openssl_CFLAGS} ${libffi_CFLAGS}"
-	export LDFLAGS="-L/usr/local/lib ${openssl_LIBS} ${libffi_LIBS}"
+	CFLAGS="-I/usr/local/include ${openssl_CFLAGS} ${libffi_CFLAGS}"
+	LDFLAGS="-L/usr/local/lib ${openssl_LIBS} ${libffi_LIBS}"
 
 	if [ ${vOS} = "Darwin" ]; then
 		MACOSX_DEPLOYMENT_TARGET=10.12

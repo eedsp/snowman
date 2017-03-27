@@ -11,11 +11,12 @@ pkg_build() {
 
 	for tPKG_NAME in libidn
 	do
-		for local PKGCONFIG_prefix in "/usr/local/opt" ${PKG_INSTALL_PATH}
+		for PKGCONFIG_prefix in "/usr/local/opt" "${PKG_INSTALL_PATH}"
 		do
 			tmpPATH="${PKGCONFIG_prefix}/${tPKG_NAME}/lib/pkgconfig"
 			if [ -e "${PKGCONFIG_prefix}" ]; then
 				PKG_CONFIG_PATH=${tmpPATH}:${PKG_CONFIG_PATH}
+				break
 			fi
 		done
 	done
@@ -23,8 +24,8 @@ pkg_build() {
     libidn_CFLAGS=$(pkg-config --cflags libidn)
     libidn_LIBS=$(pkg-config --libs libidn)
 
-	export CFLAGS="-I/usr/local/include ${libidn_CFLAGS}"
-	export LDFLAGS="-L/usr/local/lib ${libidn_LIBS}"
+	CFLAGS="-I/usr/local/include ${libidn_CFLAGS}"
+	LDFLAGS="-L/usr/local/lib ${libidn_LIBS}"
 
 	vOS=`uname -s`
 	if [ ${vOS} = "Darwin" ]; then
