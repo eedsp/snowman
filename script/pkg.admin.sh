@@ -264,7 +264,7 @@ proc_bin() {
 	local _xPKG_NAME=`(echo ${xPKG_NAME} | sed -e 's|@|/|g')`
 	local _PREFIX_="${_INSTALL_PATH_}/${_xPKG_NAME}"
 
-	log_msg "[INFO] ${1}"
+	log_msg "[INFO] ${xPKG_NAME}"
 
 	if [ -n "${_xPKG_NAME}" ] && [ -e "${_INSTALL_PATH_}" ] && 
 	   [ -n "${APP_PATH}" ] && [ -e "${APP_PATH}" ] && 
