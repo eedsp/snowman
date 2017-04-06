@@ -1,11 +1,11 @@
 pkg_info() {
 	_xDESC="Interpreted, interactive, object-oriented programming language"
 
-	_xFILE="Python-3.6.0.tgz"
-	_xFILE_PATH=Python-3.6.0
+	_xFILE="Python-2.7.13.tgz"
+	_xFILE_PATH=Python-2.7.13
 
-	_xNAME=python/3.6.0
-    _xOPT_NAME=python3
+	_xNAME=python/2.7.13
+    _xOPT_NAME=python2
 }
 
 pkg_build() {
@@ -27,14 +27,7 @@ pkg_build() {
 	./configure --prefix=${PREFIX} \
 		--enable-ipv6 \
 		--enable-shared \
-		--with-threads \
-		--without-gcc \
+        --without-gcc \
 		--without-ensurepip \
-		--enable-optimizations \
-	&& make -j 6 && make install \
-	&& (
-		cd ${PREFIX}/bin && if [ ! -e "python" ] && [ -e "python3.6" ; then
-			ln -s python3.6 python
-		fi
-	)
+	&& make -j 6 && make install 
 }

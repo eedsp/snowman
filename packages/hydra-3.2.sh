@@ -6,7 +6,6 @@ pkg_info() {
 	_xFILE_PATH=hydra-3.2
 
 	_xNAME=mpich/3.2
-
 }
 
 pkg_build() {

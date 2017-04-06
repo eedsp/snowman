@@ -24,9 +24,12 @@ pkg_build() {
 		ICU_PATH=${PKG_INSTALL_PATH}/icu
 	fi
 
-	# CFLAGS="-I/usr/local/include -I${ICU_PATH}/include"
-	# LDFLAGS="-L/usr/local/lib -L${ICU_PATH}/lib"
-
+	if [ ${vOS} = "Darwin" ]; then
+		CXXFLAGS="-stdlib=libc++ -std=c++11"
+		LDFLAGS="-stdlib=libc++"
+	elif [ ${vOS} = "Linux" ]; then
+		CXXFLAGS="-std=c++11"
+	fi
 	bootstrap.sh --prefix=${PREFIX} \
 		--libdir=${PREFIX}/lib \
 		--with-icu=${ICU_PATH} \
@@ -36,9 +39,9 @@ pkg_build() {
 	b2 --prefix=${PREFIX} \
 		--libdir=${PREFIX}/lib \
 		--user-config=user-config.jam \
-		-d2 -j4 --show-librarie threading=multi \
+		-d2 -j4 --show-librarie variant=release threading=multi \
 	&& b2 install --prefix=${PREFIX} \
 		--libdir=${PREFIX}/lib \
 		--user-config=user-config.jam \
-		-d2 -j4 --show-librarie threading=multi
+		-d2 -j4 --show-librarie variant=release threading=multi
 }

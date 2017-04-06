@@ -12,10 +12,13 @@ pkg_build() {
 	log_msg "[INFO] ${vOS}"
 
 	# for make
-	(
+	if [ ${vOS} = "Darwin" ]; then
 		./configure --prefix=${PREFIX} \
-			--system-curl --system-expat --system-zlib --system-bzip2 \
-		&& make -j 6 && make install
-	)
+			--system-curl --system-expat --system-zlib --system-bzip2 
+	elif [ ${vOS} = "Linux" ]; then
+		./configure --prefix=${PREFIX} \
+			--system-zlib --system-bzip2 
+	fi
+	make -j 6 && make install
 
 }
