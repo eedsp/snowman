@@ -10,9 +10,11 @@ pkg_info() {
 pkg_build() {
 	./Configure -Dprefix=${PREFIX} \
 		-des \
-		-Duse64bital \
 		-Duseshrplib \
 		-Duselargefiles \
 		-Dusethreads
 	make -j 6 && make install
+
+#        -Dperlpath=#{PREFIX}/bin/perl \
+#        -Dstartperl=#!#{PREFIX}/bin/perl \
 }
