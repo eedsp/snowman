@@ -1,15 +1,15 @@
 #!/bin/bash
 
-vOS=`uname -s`
+_OS_NAME=`uname -s`
 
-if [ ${vOS} = "Darwin" ]; then
+if [ ${_OS_NAME} = "Darwin" ]; then
     #PKG_LIBTOOL=on
     if [ -z "${PKG_PATH}" ]; then
         PKG_PATH=/opt/local/pkg
     fi
     #_SYS_PATH_=.pkg
     _SYS_PATH_="$(uname -m).pkg"
-elif [ ${vOS} = "Linux" ]; then
+elif [ ${_OS_NAME} = "Linux" ]; then
     if [ -z "${PKG_PATH}" ]; then
         PKG_PATH=/data/app/pkg
     fi
