@@ -26,10 +26,10 @@ pkg_build() {
     export CFLAGS="-I/usr/local/include ${jemalloc_CFLAGS} ${openssl_CFLAGS}"
     export LDFLAGS="-L/usr/local/lib ${jemalloc_LIBS} ${openssl_LIBS}"
 
-    if [ ${vOS} = "Darwin" ]; then
+    if [ ${_OS_NAME} = "Darwin" ]; then
         ./configure --prefix=${PREFIX} \
             --enable-shared --enable-pthread --with-jemalloc ${WITH_GMP}
-    elif [ ${vOS} = "Linux" ]; then
+    elif [ ${_OS_NAME} = "Linux" ]; then
         ./configure --prefix=${PREFIX} \
             --enable-shared --enable-pthread ${WITH_GMP}
     fi

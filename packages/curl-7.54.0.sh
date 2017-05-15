@@ -17,10 +17,10 @@ pkg_build() {
     export CFLAGS="-I/usr/local/include ${libidn_CFLAGS}"
     export LDFLAGS="-L/usr/local/lib ${libidn_LIBS}"
 
-    if [ ${vOS} = "Darwin" ]; then
+    if [ ${_OS_NAME} = "Darwin" ]; then
         ./configure --prefix=${PREFIX} \
             --with-libidn --with-darwinssl 
-    elif [ ${vOS} = "Linux" ]; then
+    elif [ ${_OS_NAME} = "Linux" ]; then
         ./configure --prefix=${PREFIX} \
             --with-libidn=${APP_PATH} --with-ssl=${APP_PATH} 
     fi

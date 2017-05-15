@@ -9,7 +9,7 @@ pkg_info() {
 
 pkg_build() {
 
-	log_msg "[INFO] ${vOS}"
+	log_msg "[INFO] ${_OS_NAME}"
 
 	for vPATH_prefix in "/usr/local/opt" "${PKG_INSTALL_PATH}"
 	do

@@ -21,7 +21,7 @@ pkg_build() {
     export CFLAGS="-I/usr/local/include ${openssl_CFLAGS} ${libffi_CFLAGS}"
     export LDFLAGS="-L/usr/local/lib ${openssl_LIBS} ${libffi_LIBS}"
 
-    if [ ${vOS} = "Darwin" ]; then
+    if [ ${_OS_NAME} = "Darwin" ]; then
         MACOSX_DEPLOYMENT_TARGET=10.12
     fi
     ./configure --prefix=${PREFIX} \

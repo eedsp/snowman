@@ -8,9 +8,9 @@ pkg_info() {
 }
 
 pkg_build() {
-    if [ ${vOS} = "Darwin" ]; then
+    if [ ${_OS_NAME} = "Darwin" ]; then
         BUILD_OPTION="shared darwin64-x86_64-cc"
-    elif [ ${vOS} = "Linux" ]; then
+    elif [ ${_OS_NAME} = "Linux" ]; then
         BUILD_OPTION="shared linux-x86_64"
     fi
     ./Configure --prefix=${PREFIX} ${BUILD_OPTION} && make -j 6 && make install

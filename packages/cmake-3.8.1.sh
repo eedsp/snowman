@@ -1,10 +1,10 @@
 pkg_info() {
 	_xDESC="Cross-platform make"
 
-	_xFILE="cmake-3.8.0.tar.gz"
-	_xFILE_PATH=cmake-3.8.0
+	_xFILE="cmake-3.8.1.tar.gz"
+	_xFILE_PATH=cmake-3.8.1
 
-	_xNAME=cmake/3.8.0
+	_xNAME=cmake/3.8.1
 }
 
 pkg_build() {

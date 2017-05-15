@@ -24,10 +24,10 @@ pkg_build() {
 		ICU_PATH=${PKG_INSTALL_PATH}/icu
 	fi
 
-	if [ ${vOS} = "Darwin" ]; then
+	if [ ${_OS_NAME} = "Darwin" ]; then
 		CXXFLAGS="-stdlib=libc++ -std=c++11"
 		LDFLAGS="-stdlib=libc++"
-	elif [ ${vOS} = "Linux" ]; then
+	elif [ ${_OS_NAME} = "Linux" ]; then
 		CXXFLAGS="-std=c++11"
 	fi
 	bootstrap.sh --prefix=${PREFIX} \

@@ -9,7 +9,7 @@ pkg_info() {
 
 pkg_build() {
 
-	log_msg "[INFO] ${vOS}"
+	log_msg "[INFO] ${_OS_NAME}"
 
 	# for cmake
 	if [ -e "./_build" ]; then

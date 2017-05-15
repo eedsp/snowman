@@ -9,13 +9,13 @@ pkg_info() {
 
 pkg_build() {
 
-	log_msg "[INFO] ${vOS}"
+	log_msg "[INFO] ${_OS_NAME}"
 
 	# for make
-	if [ ${vOS} = "Darwin" ]; then
+	if [ ${_OS_NAME} = "Darwin" ]; then
 		./configure --prefix=${PREFIX} \
 			--system-curl --system-expat --system-zlib --system-bzip2 
-	elif [ ${vOS} = "Linux" ]; then
+	elif [ ${_OS_NAME} = "Linux" ]; then
 		./configure --prefix=${PREFIX} \
 			--system-zlib --system-bzip2 
 	fi

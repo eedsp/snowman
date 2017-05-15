@@ -8,9 +8,9 @@ pkg_info() {
 }
 
 pkg_build() {
-	if [ ${vOS} = "Darwin" ]; then
+	if [ ${_OS_NAME} = "Darwin" ]; then
 		BUILD_OPTION=macosx
-	elif [ ${vOS} = "Linux" ]; then
+	elif [ ${_OS_NAME} = "Linux" ]; then
 		BUILD_OPTION=linux
 	fi
 	make ${BUILD_OPTION} && make INSTALL_TOP=${PREFIX} && make INSTALL_TOP=${PREFIX} install
