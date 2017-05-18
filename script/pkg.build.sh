@@ -206,8 +206,8 @@ func_link() {
                 log_info "[INFO] ln -s ../${_APP_FRAMEWORK_PATH_}/${_pNAME} ${_PKG_TOP_PATH}"
                 ln -s ../${_APP_FRAMEWORK_PATH_}/${_pNAME} ${_PKG_TOP_PATH}
             else
-                log_info " ../${_APP_FRAMEWORK_PATH_}/${_pNAME}: No such file or directory"
-                exit
+                log_info " ../${_APP_FRAMEWORK_PATH_}/${_pNAME}: No such file or directory: SKIP"
+                #exit
             fi
         )
         fi
