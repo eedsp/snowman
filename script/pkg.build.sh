@@ -203,11 +203,11 @@ func_link() {
                 rm -rf "${_PKG_TOP_PATH}"
             fi
             if [ -e "../${_APP_FRAMEWORK_PATH_}/${_pNAME}" ]; then
-                log_info "[INFO] ln -s ../${_APP_FRAMEWORK_PATH_}/${_pNAME} ${_PKG_TOP_PATH}"
+                log_msg "[INFO] ln -s ../${_APP_FRAMEWORK_PATH_}/${_pNAME} ${_PKG_TOP_PATH}"
                 ln -s ../${_APP_FRAMEWORK_PATH_}/${_pNAME} ${_PKG_TOP_PATH}
             else
-                log_info " ../${_APP_FRAMEWORK_PATH_}/${_pNAME}: No such file or directory: SKIP"
-                #exit
+                log_msg "[WARN] ../${_APP_FRAMEWORK_PATH_}/${_pNAME}: No such file or directory: SKIP"
+                exit
             fi
         )
         fi
