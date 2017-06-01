@@ -17,7 +17,7 @@ elif [ ${_OS_NAME} = "Linux" ]; then
     _SYS_PATH_=x86_64.pkg
 fi
 
-_SYS_PATH_="Frameworks/app.Framework"
+_APP_FRAMEWORK_PATH_="Frameworks/app.Framework"
 
 _PKG_LIST_FILE=pkg.list.conf
 
@@ -63,6 +63,12 @@ log_msg() {
   printf "$_LOG_MSG_FMT" $(date +%F.%T) ${BASH_LINENO[0]} "${@}"
 }
 
+proc_config() {
+    PKG_INSTALL_PREFIX=${APP_PATH}/${_APP_FRAMEWORK_PATH_}
+    PKG_INSTALL_PATH="${APP_PATH}/opt"
+}
+
+
 #proc_list() {
 #   if [ -e "${_PREFIX_}" ]; then
 #   (
@@ -101,16 +107,41 @@ log_msg() {
 #   #find . -depth -type d -empty -exec rmdir {} ;
 #}
 
+proc_opt() {
+    local xPKG_NAME="${1}"
+    local _xPKG_NAME=`(echo ${xPKG_NAME} | sed -e 's|@|/|g')`
+
+    #local _PREFIX_="${PKG_INSTALL_PREFIX}/${_xPKG_NAME}"
+    local vPKG_NAME=${_xPKG_NAME%/*}
+
+    log_msg "[INFO] ${xPKG_NAME}"
+
+    if [ -n "${_xPKG_NAME}" ] && [ -n "${vPKG_NAME}" ] && [ -e "${PKG_INSTALL_PATH}" ]; then
+        cd ${PKG_INSTALL_PATH} && (
+            if [ -n "${vPKG_NAME}" ] && [ -e "./${vPKG_NAME}" ]; then
+                #log_msg "[CMD] rm -rf ./${vPKG_NAME}"
+                rm -rf "./${vPKG_NAME}"
+            fi
+            if [ -e "../${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME}" ] && [ ! -e "./${vPKG_NAME}" ]; then
+                #log_msg "[CMD] ln -s ../${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME} ${vPKG_NAME}"
+                ln -s ../${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME} ${vPKG_NAME}
+            else
+                log_msg "[WARN] ../${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME}: No such file or directory: SKIP"
+            fi
+        )
+    fi
+}
+
 proc_link() {
     local xPKG_OPT="${1}"
     local xPKG_CMD="${2}"
     local xPKG_NAME="${3}"
     local _xPKG_NAME=`(echo ${xPKG_NAME} | sed -e 's|@|/|g')`
-    local _PREFIX_="${_INSTALL_PATH_}/${_xPKG_NAME}"
+    local _PREFIX_="${PKG_INSTALL_PREFIX}/${_xPKG_NAME}"
 
     log_msg "[INFO] ${xPKG_NAME} "
 
-    if [ -n "${_xPKG_NAME}" ] && [ -e "${_INSTALL_PATH_}" ] && 
+    if [ -n "${_xPKG_NAME}" ] && [ -e "${PKG_INSTALL_PREFIX}" ] && 
        [ -n "${APP_PATH}" ] && [ -e "${APP_PATH}" ] && 
        [ -n "${_PREFIX_}" ] && [ -e "${_PREFIX_}" ]; then
 
@@ -189,7 +220,8 @@ proc_link() {
             local vPATH=${vTMP_FILE%/*}
             local vFILE=${vTMP_FILE##*/}
 
-            local vSRC_FILE="${APP_PATH}/${_SYS_PATH_}/${_xPKG_NAME}/${vTMP_FILE}"
+            #local vSRC_FILE="${APP_PATH}/${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME}/${vTMP_FILE}"
+            local vSRC_FILE="${PKG_INSTALL_PREFIX}/${_xPKG_NAME}/${vTMP_FILE}"
 
             if [ -n "${vPATH}" ] && [ -e "${vPATH}" ] && [ -e "${APP_PATH}/${vPATH}" ]; then
             (
@@ -247,14 +279,8 @@ proc_link() {
                 ((vIDX++))
             done
         fi
-
-
-        #log_msg "[INFO] <<< $(pwd)"
         )
-#   else
-#       log_msg "[ERROR] ${_xPKG_NAME}: No such file or directory"
     fi
-
     #find . -depth -type d -empty -exec rmdir {} ;
 }
 
@@ -262,11 +288,11 @@ proc_bin() {
     local xPKG_CMD="${1}"
     local xPKG_NAME="${2}"
     local _xPKG_NAME=`(echo ${xPKG_NAME} | sed -e 's|@|/|g')`
-    local _PREFIX_="${_INSTALL_PATH_}/${_xPKG_NAME}"
+    local _PREFIX_="${PKG_INSTALL_PREFIX}/${_xPKG_NAME}"
 
     log_msg "[INFO] ${xPKG_NAME}"
 
-    if [ -n "${_xPKG_NAME}" ] && [ -e "${_INSTALL_PATH_}" ] && 
+    if [ -n "${_xPKG_NAME}" ] && [ -e "${PKG_INSTALL_PREFIX}" ] && 
        [ -n "${APP_PATH}" ] && [ -e "${APP_PATH}" ] && 
        [ -n "${_PREFIX_}" ] && [ -e "${_PREFIX_}" ]; then
 
@@ -316,7 +342,8 @@ proc_bin() {
             local vPATH=${vTMP_FILE%/*}
             local vFILE=${vTMP_FILE##*/}
 
-            local vSRC_FILE="${APP_PATH}/${_SYS_PATH_}/${_xPKG_NAME}/${vTMP_FILE}"
+            #local vSRC_FILE="${APP_PATH}/${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME}/${vTMP_FILE}"
+            local vSRC_FILE="${PKG_INSTALL_PREFIX}/${_xPKG_NAME}/${vTMP_FILE}"
 
             if [ -n "${vPATH}" ] && [ -e "${vPATH}" ]; then
             (
@@ -339,17 +366,8 @@ proc_bin() {
 
         #log_msg "[INFO] <<< $(pwd)"
         )
-    #else
-    #   log_msg "[ERROR] ${_xPKG_NAME}: No such file or directory"
     fi
-
     #find . -depth -type d -empty -exec rmdir {} ;
-}
-
-proc_config() {
-    _INSTALL_PATH_=${APP_PATH}/${_SYS_PATH_}
-
-    #log_msg "[INFO] \${APP_PATH}/\${_SYS_PATH_}: ${_INSTALL_PATH_}"
 }
 
 proc_help() {
@@ -427,6 +445,18 @@ if [ ${#@} -ne 0 ]; then
 #               ((vIDX++))
 #           done
 #           log_msg "[CMD] <<<< ${0} ${xPKG_CMD}"
+        elif [ "${xPKG_CMD}" = "opt" ]; then
+            log_msg "[CMD] >>>> ${0} ${xPKG_CMD}"
+
+            . ./${_PKG_LIST_FILE}
+
+            vIDX=0
+            while [ ${vIDX} -lt ${#_PKG_OPT_LIST_[@]} ]; do
+                proc_opt "${_PKG_OPT_LIST_[${vIDX}]}"
+                ((vIDX++))
+            done
+
+            log_msg "[CMD] <<<< ${0} ${xPKG_CMD}"
         elif [ "${xPKG_CMD}" = "pkg" ]; then
             log_msg "[CMD] >>>> ${0} ${xPKG_CMD}"
 

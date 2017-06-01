@@ -197,18 +197,19 @@ func_link() {
         fi
         if [ -n  "${_PKG_TOP_PATH}" ]; then
         (
-            cd ${PKG_INSTALL_PATH}
+            cd ${PKG_INSTALL_PATH} && (
             if [ -e "${_PKG_TOP_PATH}" ]; then
                 log_msg "[CMD] rm -rf ${_PKG_TOP_PATH}"
                 rm -rf "${_PKG_TOP_PATH}"
             fi
-            if [ -e "../${_APP_FRAMEWORK_PATH_}/${_pNAME}" ]; then
+            if [ -e "../${_APP_FRAMEWORK_PATH_}/${_pNAME}" ] && [ ! -e "${_PKG_TOP_PATH}" ]; then
                 log_msg "[INFO] ln -s ../${_APP_FRAMEWORK_PATH_}/${_pNAME} ${_PKG_TOP_PATH}"
                 ln -s ../${_APP_FRAMEWORK_PATH_}/${_pNAME} ${_PKG_TOP_PATH}
             else
                 log_msg "[WARN] ../${_APP_FRAMEWORK_PATH_}/${_pNAME}: No such file or directory: SKIP"
                 exit
             fi
+            )
         )
         fi
     fi
