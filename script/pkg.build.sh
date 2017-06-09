@@ -17,6 +17,10 @@ elif [ ${_OS_NAME} = "Linux" ]; then
     _SYS_PATH_="$(uname -m).pkg"
 fi
 
+if [ -n "${PKG_PATH}" ]; then
+    _PKGX_PATH_=${PKG_PATH}/.pkg
+fi
+
 _APP_FRAMEWORK_PATH_="Frameworks/app.Framework"
 
 export PATH=/usr/bin:/bin:${PATH}
@@ -30,6 +34,7 @@ export PATH=/usr/bin:/bin:${PATH}
 _BUILD_PKG_SCRIPT_PATH_=${PKGM}/packages
 _BUILD_TEMP_PATH_=${PKGM}/var/tmp
 _BUILD_OPT=0
+_BUILD_OPT_LINK=0
 
 # #############################################################################
 
@@ -134,17 +139,17 @@ func_check_install_path() {
         log_info "${APP_PATH}: No such file or directory"
         exit
     fi
-    if [ ! -e "${PKG_INSTALL_PREFIX}" ]; then
-        log_info "${PKG_INSTALL_PREFIX}: No such file or directory"
+    if [ ! -e "${_PKG_INSTALL_PREFIX_}" ]; then
+        log_info "${_PKG_INSTALL_PREFIX_}: No such file or directory"
         exit
     fi
-    if [ ! -e "${PKG_INSTALL_PATH}" ]; then
-        log_msg "[CMD] mkdir -p ${PKG_INSTALL_PATH}"
-        mkdir -p "${PKG_INSTALL_PATH}"
+    if [ ! -e "${_PKG_INSTALL_PATH_}" ]; then
+        log_msg "[CMD] mkdir -p ${_PKG_INSTALL_PATH_}"
+        mkdir -p "${_PKG_INSTALL_PATH_}"
     fi
 
-    if [ ! -e "${PKG_INSTALL_PATH}" ]; then
-        log_info "${PKG_INSTALL_PATH}: No such file or directory"
+    if [ ! -e "${_PKG_INSTALL_PATH_}" ]; then
+        log_info "${_PKG_INSTALL_PATH_}: No such file or directory"
         exit
     fi
 }
@@ -156,7 +161,7 @@ func_pkgconfig()
     local _pPKG_LIST=${@}
     local _pPATH_LIST=(
         "/usr/local/opt"
-        "${PKG_INSTALL_PATH}"
+        "${_PKG_INSTALL_PATH_}"
     )
 
     local _PKG_CONFIG_PATH_
@@ -189,7 +194,7 @@ func_pkgconfig()
 func_link() {
     local _pNAME=${1}
 
-    if [ -n "${_pNAME}" ]; then
+    if [ ${_BUILD_OPT_LINK} -eq 0 ] && [ -n "${_pNAME}" ]; then
         local _PKG_TOP_PATH=${_pNAME%%/*}
 
         if [ -n "${_xOPT_NAME}" ]; then
@@ -197,17 +202,20 @@ func_link() {
         fi
         if [ -n  "${_PKG_TOP_PATH}" ]; then
         (
-            cd ${PKG_INSTALL_PATH} && (
+            cd ${_PKG_INSTALL_PATH_} && (
             if [ -e "${_PKG_TOP_PATH}" ]; then
                 log_msg "[CMD] rm -rf ${_PKG_TOP_PATH}"
                 rm -rf "${_PKG_TOP_PATH}"
             fi
-            if [ -e "../${_APP_FRAMEWORK_PATH_}/${_pNAME}" ] && [ ! -e "${_PKG_TOP_PATH}" ]; then
-                log_msg "[INFO] ln -s ../${_APP_FRAMEWORK_PATH_}/${_pNAME} ${_PKG_TOP_PATH}"
+
+            local xSRC="../${_APP_FRAMEWORK_PATH_}/${_pNAME}"
+
+            if [ -e "${xSRC}" ] && [ ! -e "${_PKG_TOP_PATH}" ]; then
+                log_msg "[INFO] ln -s ${xSRC} ${_PKG_TOP_PATH}"
                 ln -s ../${_APP_FRAMEWORK_PATH_}/${_pNAME} ${_PKG_TOP_PATH}
             else
-                log_msg "[WARN] ../${_APP_FRAMEWORK_PATH_}/${_pNAME}: No such file or directory: SKIP"
-                exit
+                log_msg "[WARN] ${xSRC}: No such file or directory: SKIP"
+                #exit
             fi
             )
         )
@@ -218,6 +226,7 @@ func_link() {
 func_build() {
     local _BUILD_OPT="${1}"
     local _PKG_FILE_="${2}"
+    local _CONF_EXT="conf"
 
     if [ ${_BUILD_OPT} -eq 1 ]; then
         if [ -e "${_PKG_FILE_}" ]; then
@@ -229,8 +238,8 @@ func_build() {
     else
         if [ -e "${_BUILD_PKG_SCRIPT_PATH_}/${_PKG_FILE_}" ]; then
             . ${_BUILD_PKG_SCRIPT_PATH_}/${_PKG_FILE_}
-        elif [ -e "${_BUILD_PKG_SCRIPT_PATH_}/${_PKG_FILE_}.sh" ]; then
-            . ${_BUILD_PKG_SCRIPT_PATH_}/${_PKG_FILE_}.sh
+        elif [ -e "${_BUILD_PKG_SCRIPT_PATH_}/${_PKG_FILE_}.${_CONF_EXT}" ]; then
+            . ${_BUILD_PKG_SCRIPT_PATH_}/${_PKG_FILE_}.${_CONF_EXT}
         else
             log_msg "[ERROR] ${_PKG_FILE_}: No such file or directory"
             exit
@@ -257,7 +266,11 @@ func_build() {
         exit
     fi
 
-    PREFIX="${PKG_INSTALL_PREFIX}/${_xNAME}"
+    if [ -z "${PREFIX}" ]; then
+        PREFIX="${_PKG_INSTALL_PREFIX_}/${_xNAME}"
+    else
+        _BUILD_OPT_LINK=1
+    fi
 
     log_msg "[INFO] _BUILD_PATH_ : ${_BUILD_PATH_}"
     log_msg "[INFO] _xDESC       : ${_xDESC}"
@@ -300,8 +313,8 @@ func_build() {
 # #############################################################################
 
 func_config() {
-    PKG_INSTALL_PREFIX=${APP_PATH}/${_APP_FRAMEWORK_PATH_}
-    PKG_INSTALL_PATH="${APP_PATH}/opt"
+    _PKG_INSTALL_PREFIX_=${APP_PATH}/${_APP_FRAMEWORK_PATH_}
+    _PKG_INSTALL_PATH_="${APP_PATH}/opt"
 
     func_check_build_path
     func_check_install_path
@@ -347,7 +360,7 @@ if [ ${#@} -ne 0 ]; then
     fi
 
     func_config
-    log_msg "[INFO] \${PKG_INSTALL_PREFIX}: ${PKG_INSTALL_PREFIX}"
+    log_msg "[INFO] \${_PKG_INSTALL_PREFIX_}: ${_PKG_INSTALL_PREFIX_}"
 
     for xPKG_NAME in ${xPKG_LIST[@]}
     do
