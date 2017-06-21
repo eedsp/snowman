@@ -206,6 +206,8 @@ func_link() {
             if [ -e "${_PKG_TOP_PATH}" ]; then
                 log_msg "[CMD] rm -rf ${_PKG_TOP_PATH}"
                 rm -rf "${_PKG_TOP_PATH}"
+            else
+                log_msg "[WARN] ${_PKG_TOP_PATH}: No such file or directory: SKIP"
             fi
 
             local xSRC="../${_APP_FRAMEWORK_PATH_}/${_pNAME}"

@@ -121,6 +121,8 @@ proc_opt() {
             if [ -n "${vPKG_NAME}" ] && [ -e "./${vPKG_NAME}" ]; then
                 #log_msg "[CMD] rm -rf ./${vPKG_NAME}"
                 rm -rf "./${vPKG_NAME}"
+            else
+                log_msg "[WARN] ./${vPKG_NAME}: No such file or directory: SKIP"
             fi
             if [ -e "../${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME}" ] && [ ! -e "./${vPKG_NAME}" ]; then
                 #log_msg "[CMD] ln -s ../${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME} ${vPKG_NAME}"
