@@ -208,7 +208,7 @@ func_link() {
                 log_msg "[CMD] rm -rf ${_PKG_NAME_}"
                 rm -rf "${_PKG_NAME_}"
             else
-                log_msg "[WARN] ${_PKG_NAME_}: No such file or directory: SKIP"
+                log_msg "[INFO] ${_PKG_NAME_}: No such file or directory"
             fi
 
             local xSRC="../${_APP_FRAMEWORK_PATH_}/${_pNAME}"
@@ -217,7 +217,7 @@ func_link() {
                 log_msg "[INFO] ln -s ${xSRC} ${_PKG_NAME_}"
                 ln -s ../${_APP_FRAMEWORK_PATH_}/${_pNAME} ${_PKG_NAME_}
             else
-                log_msg "[WARN] ${xSRC}: No such file or directory: SKIP"
+                log_msg "[INFO] ${xSRC}: No such file or directory"
             fi
             )
         )
