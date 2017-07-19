@@ -29,6 +29,10 @@ _BUILD_SCRIPT_PATH_=${PKG_BUILD_HOME}/packages
 _BUILD_PATH_=${PKG_BUILD_HOME}/var/tmp
 _SOURCE_PATH_=${PKG_BUILD_HOME}/var/src
 
+if [ -n "${PKG_SOURCE_PATH}" ]; then
+    _SOURCE_PATH_=${PKG_SOURCE_PATH}
+fi
+
 _BUILD_OPT=0
 _BUILD_OPT_LINK=0
 
@@ -52,20 +56,17 @@ log_info() {
 
 # #############################################################################
 
-proc_mkdir() {
+func_mkdir() {
     local pDIR=${1}
 
     if [ -z "${pDIR}" ]; then
-        log_msg "[INFO] ${pDIR}: No such file or directory"
+        log_msg "[ERROR] ${pDIR}: No such file or directory"
         exit
     fi
 
     if [ ! -e "${pDIR}" ]; then
-#        log_msg "[INFO] ${pDIR}: No such file or directory"
         log_msg "[CMD] mkdir -p ${pDIR}"
         mkdir -p "${pDIR}"
-#    else
-#        log_msg "[INFO] \${pDIR} - ${pDIR}: File exists"
     fi
 
     if [ ! -e "${pDIR}" ]; then
@@ -124,16 +125,15 @@ func_prepare_file() {
 }
 
 func_check_build_path() {
-
     if [ -n "${_SOURCE_PATH_}" ]; then
-        proc_mkdir "${_SOURCE_PATH_}"
+        func_mkdir "${_SOURCE_PATH_}"
     else
         log_msg "[ERROR] \${_SOURCE_PATH_}: ${_SOURCE_PATH_}: No such file or directory"
         exit
     fi
 
     if [ -n "${_BUILD_PATH_}" ]; then
-        proc_mkdir "${_BUILD_PATH_}"
+        func_mkdir "${_BUILD_PATH_}"
     else
         log_msg "[ERROR] \${_BUILD_PATH_}: ${_BUILD_PATH_}: No such file or directory"
         exit
@@ -141,25 +141,17 @@ func_check_build_path() {
 }
 
 func_check_install_path() {
-
-
-    if [ -z "${APP_PATH}" ]; then
-        log_info "${APP_PATH}: No such file or directory"
+    if [ -n "${_PKG_INSTALL_PREFIX_}" ]; then
+        func_mkdir "${_PKG_INSTALL_PREFIX_}"
+    else
+        log_msg "[ERROR] \${_PKG_INSTALL_PREFIX_} : ${_PKG_INSTALL_PREFIX_}: No such file or directory"
         exit
     fi
 
-    if [ ! -e "${_PKG_INSTALL_PREFIX_}" ]; then
-        log_info "${_PKG_INSTALL_PREFIX_}: No such file or directory"
-        exit
-    fi
-
-    proc_mkdir "${_PKG_OPT_PATH_}"
-
-#    if [ ! -e "${_PKG_OPT_PATH_}" ]; then
-#        log_msg "[CMD] mkdir -p ${_PKG_OPT_PATH_}"
-#        mkdir -p "${_PKG_OPT_PATH_}"
-#    fi
-
+    if [ -n "${_PKG_OPT_PATH_}" ]; then
+        func_mkdir "${_PKG_OPT_PATH_}"
+    else
+        log_msg "[ERROR] \${_PKG_OPT_PATH_} : ${_PKG_OPT_PATH_}: No such file or directory"
 }
 
 # #############################################################################
@@ -322,6 +314,11 @@ func_build() {
 # #############################################################################
 
 func_config() {
+    if [ -z "${APP_PATH}" ]
+        log_info "\${APP_PATH}: No such file or directory"
+        exit
+    fi
+
     _PKG_INSTALL_PREFIX_=${APP_PATH}/${_APP_FRAMEWORK_PATH_}
     _PKG_OPT_PATH_="${APP_PATH}/opt"
 
