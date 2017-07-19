@@ -152,6 +152,7 @@ func_check_install_path() {
         func_mkdir "${_PKG_OPT_PATH_}"
     else
         log_msg "[ERROR] \${_PKG_OPT_PATH_} : ${_PKG_OPT_PATH_}: No such file or directory"
+    fi
 }
 
 # #############################################################################
@@ -314,7 +315,7 @@ func_build() {
 # #############################################################################
 
 func_config() {
-    if [ -z "${APP_PATH}" ]
+    if [ -z "${APP_PATH}" ]; then
         log_info "\${APP_PATH}: No such file or directory"
         exit
     fi
