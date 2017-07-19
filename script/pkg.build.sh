@@ -3,36 +3,32 @@
 _OS_NAME=`uname -s`
 
 if [ ${_OS_NAME} = "Darwin" ]; then
-    #PKG_LIBTOOL=on
     if [ -z "${PKG_PATH}" ]; then
         PKG_PATH=/opt/local/pkg
     fi
-    #_SYS_PATH_=.pkg
-    _SYS_PATH_="$(uname -m).pkg"
 elif [ ${_OS_NAME} = "Linux" ]; then
     if [ -z "${PKG_PATH}" ]; then
         PKG_PATH=/data/app/pkg
     fi
-    #_SYS_PATH_=.pkg
-    _SYS_PATH_="$(uname -m).pkg"
 fi
+
+#_SYS_PATH_=.pkg
+#_SYS_PATH_="$(uname -m).pkg"
+
+_APP_FRAMEWORK_PATH_="Frameworks/app.Framework"
 
 if [ -n "${PKG_PATH}" ]; then
     _PKGX_PATH_=${PKG_PATH}/.pkg
 fi
 
-_APP_FRAMEWORK_PATH_="Frameworks/app.Framework"
-
 export PATH=/usr/bin:/bin:${PATH}
-
-#if [ -z "${PKG_CONFIG_PATH}" ]; then
-#    export PKG_CONFIG_PATH=/opt/local/lib/pkgconfig:/usr/local/lib/pkgconfig:/usr/lib/pkgconfig
-#fi
 
 # #############################################################################
 
-_BUILD_PKG_SCRIPT_PATH_=${PKGM}/packages
-_BUILD_TEMP_PATH_=${PKGM}/var/tmp
+_BUILD_SCRIPT_PATH_=${PKG_BUILD_HOME}/packages
+_BUILD_PATH_=${PKG_BUILD_HOME}/var/tmp
+_SOURCE_PATH_=${PKG_BUILD_HOME}/var/src
+
 _BUILD_OPT=0
 _BUILD_OPT_LINK=0
 
@@ -55,6 +51,28 @@ log_info() {
 }
 
 # #############################################################################
+
+proc_mkdir() {
+    local pDIR=${1}
+
+    if [ -z "${pDIR}" ]; then
+        log_msg "[INFO] ${pDIR}: No such file or directory"
+        exit
+    fi
+
+    if [ ! -e "${pDIR}" ]; then
+#        log_msg "[INFO] ${pDIR}: No such file or directory"
+        log_msg "[CMD] mkdir -p ${pDIR}"
+        mkdir -p "${pDIR}"
+#    else
+#        log_msg "[INFO] \${pDIR} - ${pDIR}: File exists"
+    fi
+
+    if [ ! -e "${pDIR}" ]; then
+        log_msg "[ERROR] ${pDIR}: No such file or directory"
+        exit
+    fi
+}
 
 func_prepare_file() {
     local vFILE=${1}
@@ -106,52 +124,42 @@ func_prepare_file() {
 }
 
 func_check_build_path() {
-    if [ -z "${_BUILD_TEMP_PATH_}" ]; then
-        log_msg "[INFO] ${_BUILD_TEMP_PATH_}: No such file or directory"
-        exit
-    fi
-    if [ ! -e "${_BUILD_TEMP_PATH_}" ]; then
-        log_msg "[INFO] ${_BUILD_TEMP_PATH_}: No such file or directory"
-        log_msg "[CMD] mkdir -p ${_BUILD_TEMP_PATH_}"
-        mkdir -p "${_BUILD_TEMP_PATH_}"
+
+    if [ -n "${_SOURCE_PATH_}" ]; then
+        proc_mkdir "${_SOURCE_PATH_}"
     else
-        log_msg "[INFO] \${_BUILD_TEMP_PATH_} - ${_BUILD_TEMP_PATH_}: File exists"
-    fi
-
-    #_BUILD_PATH_=${_BUILD_TEMP_PATH_}/${_vDATE}
-    _BUILD_PATH_=${_BUILD_TEMP_PATH_}
-
-    if [ -z "${_BUILD_PATH_}" ]; then
-        log_msg "[INFO] ${_BUILD_PATH_}: No such file or directory"
+        log_msg "[ERROR] \${_SOURCE_PATH_}: ${_SOURCE_PATH_}: No such file or directory"
         exit
     fi
 
-    if [ ! -e "${_BUILD_PATH_}" ]; then
-        log_msg "[CMD] mkdir -p ${_BUILD_PATH_}"
-        mkdir -p "${_BUILD_PATH_}"
+    if [ -n "${_BUILD_PATH_}" ]; then
+        proc_mkdir "${_BUILD_PATH_}"
     else
-        log_msg "[INFO] \${_BUILD_PATH_} - ${_BUILD_PATH_}: File exists"
+        log_msg "[ERROR] \${_BUILD_PATH_}: ${_BUILD_PATH_}: No such file or directory"
+        exit
     fi
 }
 
 func_check_install_path() {
+
+
     if [ -z "${APP_PATH}" ]; then
         log_info "${APP_PATH}: No such file or directory"
         exit
     fi
+
     if [ ! -e "${_PKG_INSTALL_PREFIX_}" ]; then
         log_info "${_PKG_INSTALL_PREFIX_}: No such file or directory"
         exit
     fi
-    if [ ! -e "${_PKG_INSTALL_PATH_}" ]; then
-        log_msg "[CMD] mkdir -p ${_PKG_INSTALL_PATH_}"
-        mkdir -p "${_PKG_INSTALL_PATH_}"
-    fi
 
-    if [ ! -e "${_PKG_INSTALL_PATH_}" ]; then
-        log_info "${_PKG_INSTALL_PATH_}: No such file or directory"
-        exit
-    fi
+    proc_mkdir "${_PKG_OPT_PATH_}"
+
+#    if [ ! -e "${_PKG_OPT_PATH_}" ]; then
+#        log_msg "[CMD] mkdir -p ${_PKG_OPT_PATH_}"
+#        mkdir -p "${_PKG_OPT_PATH_}"
+#    fi
+
 }
 
 # #############################################################################
@@ -161,7 +169,7 @@ func_pkgconfig()
     local _pPKG_LIST=${@}
     local _pPATH_LIST=(
         "/usr/local/opt"
-        "${_PKG_INSTALL_PATH_}"
+        "${_PKG_OPT_PATH_}"
     )
 
     local _PKG_CONFIG_PATH_
@@ -195,29 +203,28 @@ func_link() {
     local _pNAME=${1}
 
     if [ ${_BUILD_OPT_LINK} -eq 0 ] && [ -n "${_pNAME}" ]; then
-        local _PKG_TOP_PATH=${_pNAME%%/*}
+        local _PKG_NAME_=${_pNAME%%/*}
 
         if [ -n "${_xOPT_NAME}" ]; then
-            _PKG_TOP_PATH=${_xOPT_NAME}
+            _PKG_NAME_=${_xOPT_NAME}
         fi
-        if [ -n  "${_PKG_TOP_PATH}" ]; then
+        if [ -n  "${_PKG_NAME_}" ]; then
         (
-            cd ${_PKG_INSTALL_PATH_} && (
-            if [ -e "${_PKG_TOP_PATH}" ]; then
-                log_msg "[CMD] rm -rf ${_PKG_TOP_PATH}"
-                rm -rf "${_PKG_TOP_PATH}"
+            cd ${_PKG_OPT_PATH_} && (
+            if [ -e "${_PKG_NAME_}" ]; then
+                log_msg "[CMD] rm -rf ${_PKG_NAME_}"
+                rm -rf "${_PKG_NAME_}"
             else
-                log_msg "[WARN] ${_PKG_TOP_PATH}: No such file or directory: SKIP"
+                log_msg "[WARN] ${_PKG_NAME_}: No such file or directory: SKIP"
             fi
 
             local xSRC="../${_APP_FRAMEWORK_PATH_}/${_pNAME}"
 
-            if [ -e "${xSRC}" ] && [ ! -e "${_PKG_TOP_PATH}" ]; then
-                log_msg "[INFO] ln -s ${xSRC} ${_PKG_TOP_PATH}"
-                ln -s ../${_APP_FRAMEWORK_PATH_}/${_pNAME} ${_PKG_TOP_PATH}
+            if [ -e "${xSRC}" ] && [ ! -e "${_PKG_NAME_}" ]; then
+                log_msg "[INFO] ln -s ${xSRC} ${_PKG_NAME_}"
+                ln -s ../${_APP_FRAMEWORK_PATH_}/${_pNAME} ${_PKG_NAME_}
             else
                 log_msg "[WARN] ${xSRC}: No such file or directory: SKIP"
-                #exit
             fi
             )
         )
@@ -238,10 +245,10 @@ func_build() {
             exit
         fi
     else
-        if [ -e "${_BUILD_PKG_SCRIPT_PATH_}/${_PKG_FILE_}" ]; then
-            . ${_BUILD_PKG_SCRIPT_PATH_}/${_PKG_FILE_}
-        elif [ -e "${_BUILD_PKG_SCRIPT_PATH_}/${_PKG_FILE_}.${_CONF_EXT}" ]; then
-            . ${_BUILD_PKG_SCRIPT_PATH_}/${_PKG_FILE_}.${_CONF_EXT}
+        if [ -e "${_BUILD_SCRIPT_PATH_}/${_PKG_FILE_}" ]; then
+            . ${_BUILD_SCRIPT_PATH_}/${_PKG_FILE_}
+        elif [ -e "${_BUILD_SCRIPT_PATH_}/${_PKG_FILE_}.${_CONF_EXT}" ]; then
+            . ${_BUILD_SCRIPT_PATH_}/${_PKG_FILE_}.${_CONF_EXT}
         else
             log_msg "[ERROR] ${_PKG_FILE_}: No such file or directory"
             exit
@@ -281,11 +288,11 @@ func_build() {
     log_msg "[INFO] APP_PATH     : ${APP_PATH}"
     log_msg "[INFO] PREFIX       : ${PREFIX}"
 
-    log_msg "[INFO] \$_BUILD_OPT : $_BUILD_OPT"
+    #log_msg "[INFO] _BUILD_OPT   : ${_BUILD_OPT}"
     if [ ${_BUILD_OPT} -eq 0 ]; then
 
-        log_msg "[INFO] find ${PKGM_SRC_PATH} -name ${_xFILE} -print | head -n 1"
-        local _xSRC_FILE=$(find ${PKGM_SRC_PATH} -name ${_xFILE} -print | head -n 1)
+        log_msg "[INFO] find ${_SOURCE_PATH_} -name ${_xFILE} -print | head -n 1"
+        local _xSRC_FILE=$(find ${_SOURCE_PATH_} -name ${_xFILE} -print | head -n 1)
         log_msg "[INFO] ${_xSRC_FILE}"
         if [ -n "${_xSRC_FILE}" ]; then
             func_prepare_file "${_xSRC_FILE}" "${_BUILD_PATH_}"
@@ -316,7 +323,7 @@ func_build() {
 
 func_config() {
     _PKG_INSTALL_PREFIX_=${APP_PATH}/${_APP_FRAMEWORK_PATH_}
-    _PKG_INSTALL_PATH_="${APP_PATH}/opt"
+    _PKG_OPT_PATH_="${APP_PATH}/opt"
 
     func_check_build_path
     func_check_install_path
