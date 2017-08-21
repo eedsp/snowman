@@ -34,6 +34,7 @@
 
 var/*
 _BUILD/*
+_UNUSED/*
 ??_BACKUP/*
 default.pkg.sh
 0.pkg.admin.sh
