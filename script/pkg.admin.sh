@@ -68,6 +68,19 @@ proc_config() {
     PKG_INSTALL_PATH="${APP_PATH}/opt"
 }
 
+proc_symlink() {
+    for vFILES in $(/bin/ls -c1 ${PKG_INSTALL_PATH})
+    do
+        local vFILE="${PKG_INSTALL_PATH}/${vFILES}"
+        if [ -n "${vFILE}" ] && [ -L "${vFILE}" ] ; then
+            if [ ! -e "${vFILE}" ] ; then
+                log_msg "[ERROR] ${vFILE} exists and is not a symlink"
+                log_msg "[CMD] DELETE ${vFILE}"
+                rm -rf "${vFILE}"
+            fi
+        fi
+    done
+}
 
 #proc_list() {
 #   if [ -e "${_PREFIX_}" ]; then
@@ -414,6 +427,7 @@ if [ ${#@} -ne 0 ]; then
 
     if [ -n "${xPKG_CMD}" ]; then
         proc_config
+        proc_symlink
 
         if [ "${xPKG_CMD}" = "reset" ]; then
             if [ -e "${APP_PATH}" ]; then
