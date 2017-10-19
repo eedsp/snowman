@@ -53,13 +53,13 @@ _SKIP_LIST=(
 
 proc_config() {
     _PKG_INSTALL_PREFIX_=${APP_PREFIX}/${_APP_FRAMEWORK_PATH_}
-    _PKG_INSTALL_OPT_="${APP_PREFIX}/opt"
+    _PKG_OPT_PATH_="${APP_PREFIX}/opt"
 }
 
 proc_symlink() {
-    for vFILES in $(/bin/ls -c1 ${_PKG_INSTALL_OPT_})
+    for vFILES in $(/bin/ls -c1 ${_PKG_OPT_PATH_})
     do
-        local vFILE="${_PKG_INSTALL_OPT_}/${vFILES}"
+        local vFILE="${_PKG_OPT_PATH_}/${vFILES}"
         if [ -n "${vFILE}" ] && [ -L "${vFILE}" ] ; then
             if [ ! -e "${vFILE}" ] ; then
                 log_msg "[ERROR] ${vFILE} exists and is not a symlink"
@@ -82,8 +82,8 @@ proc_opt() {
 
     log_msg "[INFO] ${xPKG_NAME}"
 
-    if [ -n "${_xPKG_NAME}" ] && [ -n "${vPKG_NAME}" ] && [ -e "${_PKG_INSTALL_OPT_}" ]; then
-        cd ${_PKG_INSTALL_OPT_} && (
+    if [ -n "${_xPKG_NAME}" ] && [ -n "${vPKG_NAME}" ] && [ -e "${_PKG_OPT_PATH_}" ]; then
+        cd ${_PKG_OPT_PATH_} && (
             if [ -n "${vPKG_NAME}" ] && [ -e "./${vPKG_NAME}" ]; then
                 #log_msg "[CMD] rm -rf ./${vPKG_NAME}"
                 rm -rf "./${vPKG_NAME}"

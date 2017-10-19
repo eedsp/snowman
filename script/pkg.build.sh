@@ -136,10 +136,10 @@ func_check_install_path() {
         exit
     fi
 
-    if [ -n "${_PKG_INSTALL_OPT_}" ]; then
-        func_mkdir "${_PKG_INSTALL_OPT_}"
+    if [ -n "${_PKG_OPT_PATH_}" ]; then
+        func_mkdir "${_PKG_OPT_PATH_}"
     else
-        log_msg "[ERROR] \${_PKG_INSTALL_OPT_} : ${_PKG_INSTALL_OPT_}: No such file or directory"
+        log_msg "[ERROR] \${_PKG_OPT_PATH_} : ${_PKG_OPT_PATH_}: No such file or directory"
     fi
 }
 
@@ -150,7 +150,7 @@ func_pkgconfig()
     local _pPKG_LIST=${@}
     local _pPATH_LIST=(
         "/usr/local/opt"
-        "${_PKG_INSTALL_OPT_}"
+        "${_PKG_OPT_PATH_}"
     )
 
     local _PKG_CONFIG_PATH_
@@ -191,7 +191,7 @@ func_link() {
         fi
         if [ -n  "${_PKG_NAME_}" ]; then
         (
-            cd ${_PKG_INSTALL_OPT_} && (
+            cd ${_PKG_OPT_PATH_} && (
             if [ -e "${_PKG_NAME_}" ]; then
                 log_msg "[CMD] rm -rf ${_PKG_NAME_}"
                 rm -rf "${_PKG_NAME_}"
@@ -309,7 +309,7 @@ func_config() {
     fi
 
     _PKG_INSTALL_PREFIX_=${APP_PREFIX}/${_APP_FRAMEWORK_PATH_}
-    _PKG_INSTALL_OPT_="${APP_PREFIX}/opt"
+    _PKG_OPT_PATH_="${APP_PREFIX}/opt"
 
     func_check_build_path
     func_check_install_path
