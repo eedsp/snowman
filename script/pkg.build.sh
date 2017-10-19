@@ -37,6 +37,9 @@ _SOURCE_PATH_=${PKG_BUILD_PATH}/var/src
 
 if [ -n "${PKG_BUILD_SOURCE_PATH}" ]; then
     _SOURCE_PATH_=${PKG_BUILD_SOURCE_PATH}
+else
+    log_msg "[INFO] \${PKG_BUILD_SOURCE_PATH}: Environment variable not found."
+    log_msg "[INFO] PKG_BUILD_SOURCE_PATH=${_SOURCE_PATH_}"
 fi
 
 _BUILD_OPT=0
