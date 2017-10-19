@@ -71,7 +71,7 @@ proc_symlink() {
 }
 
 func_pkg_name() {
-   echo ${1} | sed -e 's|-|/|g'
+   echo ${1} | sed -e 's|@|/|g'
 }
 
 proc_opt() {
