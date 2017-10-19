@@ -2,26 +2,23 @@
 
 _OS_NAME=`uname -s`
 
-if [ ${_OS_NAME} = "Darwin" ]; then
-    #PKG_LIBTOOL=on
-    if [ -z "${PKG_PATH}" ]; then
-        PKG_PATH=/opt/local/pkg
-    fi
-    #_SYS_PATH_="$(uname -m).pkg"
-    _SYS_PATH_=x86_64.pkg
-elif [ ${_OS_NAME} = "Linux" ]; then
-    if [ -z "${PKG_PATH}" ]; then
-        PKG_PATH=/data/app/pkg
-    fi
-    #_SYS_PATH_="$(uname -m).pkg"
-    _SYS_PATH_=x86_64.pkg
-fi
-
 _APP_FRAMEWORK_PATH_="Frameworks/app.Framework"
-
 _PKG_LIST_FILE=pkg.list.conf
 
 export PATH=/usr/bin:/bin:${PATH}
+
+# #############################################################################
+
+_vDATE=$(date +'%Y%m')
+_LOG_HDR_FMT="%.23s[%3d] %s"
+_LOG_MSG_FMT="${_LOG_HDR_FMT}%s\n"
+
+log_msg() {
+  #printf "$_LOG_MSG_FMT" $(date +%F.%T) ${BASH_SOURCE[1]##*/} ${BASH_LINENO[0]} "${@}"
+  printf "$_LOG_MSG_FMT" $(date +%F.%T) ${BASH_LINENO[0]} "${@}"
+}
+
+# #############################################################################
 
 _FOLDER_LIST=(
     "bin"
@@ -54,24 +51,15 @@ _SKIP_LIST=(
 # echo "${FILE##*.}"
 # gz
 
-_vDATE=$(date +'%Y%m')
-_LOG_HDR_FMT="%.23s[%3d] %s"
-_LOG_MSG_FMT="${_LOG_HDR_FMT}%s\n"
-
-log_msg() {
-  #printf "$_LOG_MSG_FMT" $(date +%F.%T) ${BASH_SOURCE[1]##*/} ${BASH_LINENO[0]} "${@}"
-  printf "$_LOG_MSG_FMT" $(date +%F.%T) ${BASH_LINENO[0]} "${@}"
-}
-
 proc_config() {
-    PKG_INSTALL_PREFIX=${APP_PATH}/${_APP_FRAMEWORK_PATH_}
-    PKG_INSTALL_PATH="${APP_PATH}/opt"
+    _PKG_INSTALL_PREFIX_=${APP_PREFIX}/${_APP_FRAMEWORK_PATH_}
+    _PKG_INSTALL_OPT_="${APP_PREFIX}/opt"
 }
 
 proc_symlink() {
-    for vFILES in $(/bin/ls -c1 ${PKG_INSTALL_PATH})
+    for vFILES in $(/bin/ls -c1 ${_PKG_INSTALL_OPT_})
     do
-        local vFILE="${PKG_INSTALL_PATH}/${vFILES}"
+        local vFILE="${_PKG_INSTALL_OPT_}/${vFILES}"
         if [ -n "${vFILE}" ] && [ -L "${vFILE}" ] ; then
             if [ ! -e "${vFILE}" ] ; then
                 log_msg "[ERROR] ${vFILE} exists and is not a symlink"
@@ -82,55 +70,20 @@ proc_symlink() {
     done
 }
 
-#proc_list() {
-#   if [ -e "${_PREFIX_}" ]; then
-#   (
-#       _xFOLDER_LIST=()
-#       #log_msg "[CMD] cd ${_PREFIX_}"
-#       cd ${_PREFIX_}
-#       #log_msg "[INFO] PATH: $(pwd)"
-#
-#       log_msg "[INFO] ${xPKG_NAME}"
-#       for vPATH in `find . -type d | sed  -e 's|^\.$||g' | sed -e 's|^\.\/||g'`
-#       do
-#           #log_msg "[INFO]        ${vPATH}"
-#
-#           local vLAST_PATH=${vPATH##*/}
-#           local vFLAG=0
-#           
-#           for vTMP in ${_SKIP_LIST[@]}
-#           do
-#               if [ "${vTMP}" == "${vLAST_PATH}" ]; then
-#                   ((vFLAG++))
-#                   break
-#               fi
-#           done
-#           if [ "${vFLAG}" -eq 0 ]; then
-#               _xFOLDER_LIST+=( "${vPATH}" )
-#           fi
-#       done
-#
-#       vIDX=0
-#       while [ ${vIDX} -lt ${#_xFOLDER_LIST[@]} ]; do
-#           log_msg "[INFO] - ${_xFOLDER_LIST[${vIDX}]}"
-#           ((vIDX++))
-#       done
-#   )
-#   fi
-#   #find . -depth -type d -empty -exec rmdir {} ;
-#}
+func_pkg_name() {
+   echo ${1} | sed -e 's|-|/|g'
+}
 
 proc_opt() {
     local xPKG_NAME="${1}"
-    local _xPKG_NAME=`(echo ${xPKG_NAME} | sed -e 's|@|/|g')`
+    local _xPKG_NAME=$(func_pkg_name ${xPKG_NAME})
 
-    #local _PREFIX_="${PKG_INSTALL_PREFIX}/${_xPKG_NAME}"
     local vPKG_NAME=${_xPKG_NAME%/*}
 
     log_msg "[INFO] ${xPKG_NAME}"
 
-    if [ -n "${_xPKG_NAME}" ] && [ -n "${vPKG_NAME}" ] && [ -e "${PKG_INSTALL_PATH}" ]; then
-        cd ${PKG_INSTALL_PATH} && (
+    if [ -n "${_xPKG_NAME}" ] && [ -n "${vPKG_NAME}" ] && [ -e "${_PKG_INSTALL_OPT_}" ]; then
+        cd ${_PKG_INSTALL_OPT_} && (
             if [ -n "${vPKG_NAME}" ] && [ -e "./${vPKG_NAME}" ]; then
                 #log_msg "[CMD] rm -rf ./${vPKG_NAME}"
                 rm -rf "./${vPKG_NAME}"
@@ -151,13 +104,13 @@ proc_link() {
     local xPKG_OPT="${1}"
     local xPKG_CMD="${2}"
     local xPKG_NAME="${3}"
-    local _xPKG_NAME=`(echo ${xPKG_NAME} | sed -e 's|@|/|g')`
-    local _PREFIX_="${PKG_INSTALL_PREFIX}/${_xPKG_NAME}"
+    local _xPKG_NAME=$(func_pkg_name ${xPKG_NAME})
+    local _PREFIX_="${_PKG_INSTALL_PREFIX_}/${_xPKG_NAME}"
 
     log_msg "[INFO] ${xPKG_NAME} "
 
-    if [ -n "${_xPKG_NAME}" ] && [ -e "${PKG_INSTALL_PREFIX}" ] && 
-       [ -n "${APP_PATH}" ] && [ -e "${APP_PATH}" ] && 
+    if [ -n "${_xPKG_NAME}" ] && [ -e "${_PKG_INSTALL_PREFIX_}" ] && 
+       [ -n "${APP_PREFIX}" ] && [ -e "${APP_PREFIX}" ] && 
        [ -n "${_PREFIX_}" ] && [ -e "${_PREFIX_}" ]; then
 
         local _xFOLDER_LIST=()
@@ -207,15 +160,12 @@ proc_link() {
             fi
         done
 
-        #log_msg "[CMD] cd ${APP_PATH}"
-        cd "${APP_PATH}" && (
-        #log_msg "[INFO] >>> $(pwd)"
-
+        cd "${APP_PREFIX}" && (
         if ([ "${xPKG_CMD}" = "install" ] || [ "${xPKG_CMD}" = "pkg" ]) && [ ! -e "${vFILE}" ]; then
             local vIDX=0
             while [ ${vIDX} -lt ${#_xFOLDER_LIST[@]} ]; do
                 local vTMP_PATH=${_xFOLDER_LIST[${vIDX}]}
-                local vDST_PATH="${APP_PATH}/${vTMP_PATH}"
+                local vDST_PATH="${APP_PREFIX}/${vTMP_PATH}"
 
                 #log_msg "[INFO] ${vDST_PATH}"
 
@@ -223,7 +173,7 @@ proc_link() {
                     #log_msg "[CMD] mkdir -p ${vTMP_PATH}"
                     mkdir -p "${vTMP_PATH}"
                     # else
-                    #   log_msg "[INFO] ${APP_PATH} / ${vTMP_PATH}:File exists"
+                    #   log_msg "[INFO] ${APP_PREFIX} / ${vTMP_PATH}:File exists"
                 fi
                 ((vIDX++))
             done
@@ -235,12 +185,12 @@ proc_link() {
             local vPATH=${vTMP_FILE%/*}
             local vFILE=${vTMP_FILE##*/}
 
-            #local vSRC_FILE="${APP_PATH}/${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME}/${vTMP_FILE}"
-            local vSRC_FILE="${PKG_INSTALL_PREFIX}/${_xPKG_NAME}/${vTMP_FILE}"
+            #local vSRC_FILE="${APP_PREFIX}/${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME}/${vTMP_FILE}"
+            local vSRC_FILE="${_PKG_INSTALL_PREFIX_}/${_xPKG_NAME}/${vTMP_FILE}"
 
-            if [ -n "${vPATH}" ] && [ -e "${vPATH}" ] && [ -e "${APP_PATH}/${vPATH}" ]; then
+            if [ -n "${vPATH}" ] && [ -e "${vPATH}" ] && [ -e "${APP_PREFIX}/${vPATH}" ]; then
             (
-                cd "${APP_PATH}/${vPATH}" &&
+                cd "${APP_PREFIX}/${vPATH}" &&
                 if [ ${xPKG_OPT} -eq 0 ]; then
                     if [  -e "${vFILE}" ]; then
                         #log_msg "[CMD] $(pwd) rm -rf ${vFILE}"
@@ -274,7 +224,7 @@ proc_link() {
             local vIDX=0
             while [ ${vIDX} -lt ${#_xFOLDER_LIST[@]} ]; do
                 local vTMP_PATH=${_xFOLDER_LIST[${vFILDER_IDX}]}
-                local vDST_PATH="${APP_PATH}/${vTMP_PATH}"
+                local vDST_PATH="${APP_PREFIX}/${vTMP_PATH}"
 
                 #find ${vTMP_PATH} -depth -type d -empty -exec rmdir {} ;
                 #find ${vTMP_PATH} -depth -type d -empty -print
@@ -302,13 +252,13 @@ proc_link() {
 proc_bin() {
     local xPKG_CMD="${1}"
     local xPKG_NAME="${2}"
-    local _xPKG_NAME=`(echo ${xPKG_NAME} | sed -e 's|@|/|g')`
-    local _PREFIX_="${PKG_INSTALL_PREFIX}/${_xPKG_NAME}"
+    local _xPKG_NAME=$(func_pkg_name ${xPKG_NAME})
+    local _PREFIX_="${_PKG_INSTALL_PREFIX_}/${_xPKG_NAME}"
 
     log_msg "[INFO] ${xPKG_NAME}"
 
-    if [ -n "${_xPKG_NAME}" ] && [ -e "${PKG_INSTALL_PREFIX}" ] && 
-       [ -n "${APP_PATH}" ] && [ -e "${APP_PATH}" ] && 
+    if [ -n "${_xPKG_NAME}" ] && [ -e "${_PKG_INSTALL_PREFIX_}" ] && 
+       [ -n "${APP_PREFIX}" ] && [ -e "${APP_PREFIX}" ] && 
        [ -n "${_PREFIX_}" ] && [ -e "${_PREFIX_}" ]; then
 
         _xFOLDER_LIST=("bin" "sbin")
@@ -334,8 +284,8 @@ proc_bin() {
             fi
         done
 
-        #log_msg "[CMD] cd ${APP_PATH}"
-        cd "${APP_PATH}" && (
+        #log_msg "[CMD] cd ${APP_PREFIX}"
+        cd "${APP_PREFIX}" && (
         #log_msg "[INFO] >>> $(pwd)"
 
         vIDX=0
@@ -346,7 +296,7 @@ proc_bin() {
                 #log_msg "[CMD] mkdir -p ${vTMP_PATH}"
                 mkdir -p "${vTMP_PATH}"
                 # else
-                #   log_msg "[INFO] ${APP_PATH} / ${vTMP_PATH}:File exists"
+                #   log_msg "[INFO] ${APP_PREFIX} / ${vTMP_PATH}:File exists"
             fi
             ((vIDX++))
         done
@@ -357,12 +307,12 @@ proc_bin() {
             local vPATH=${vTMP_FILE%/*}
             local vFILE=${vTMP_FILE##*/}
 
-            #local vSRC_FILE="${APP_PATH}/${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME}/${vTMP_FILE}"
-            local vSRC_FILE="${PKG_INSTALL_PREFIX}/${_xPKG_NAME}/${vTMP_FILE}"
+            #local vSRC_FILE="${APP_PREFIX}/${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME}/${vTMP_FILE}"
+            local vSRC_FILE="${_PKG_INSTALL_PREFIX_}/${_xPKG_NAME}/${vTMP_FILE}"
 
             if [ -n "${vPATH}" ] && [ -e "${vPATH}" ]; then
             (
-                cd "${APP_PATH}/${vPATH}"
+                cd "${APP_PREFIX}/${vPATH}"
                 if [  -e "${vFILE}" ]; then
                     # log_msg "[CMD] $(pwd) rm -rf ${vFILE}"
                     rm -rf ${vFILE}
@@ -430,9 +380,9 @@ if [ ${#@} -ne 0 ]; then
         proc_symlink
 
         if [ "${xPKG_CMD}" = "reset" ]; then
-            if [ -e "${APP_PATH}" ]; then
+            if [ -e "${APP_PREFIX}" ]; then
             (
-                cd ${APP_PATH}
+                cd ${APP_PREFIX}
                 for vPATH in ${_FOLDER_LIST[@]}
                 do
                     if [ -e "${vPATH}" ]; then
@@ -505,8 +455,6 @@ if [ ${#@} -ne 0 ]; then
         else
             log_msg "[ERROR] ${0} <command> [package-name]"
         fi
-    #else
-        #log_msg "[ERROR] ${0} <command> [package-name]"
     fi
 else
     proc_help
