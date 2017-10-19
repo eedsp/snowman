@@ -88,8 +88,9 @@ proc_opt() {
                 #log_msg "[CMD] rm -rf ./${vPKG_NAME}"
                 rm -rf "./${vPKG_NAME}"
             else
-                log_msg "[WARN] ./${vPKG_NAME}: No such file or directory: SKIP"
+                log_msg "[INFO] ./${vPKG_NAME}: No such file or directory; Create a new symbolic link"
             fi
+
             if [ -e "../${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME}" ] && [ ! -e "./${vPKG_NAME}" ]; then
                 #log_msg "[CMD] ln -s ../${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME} ${vPKG_NAME}"
                 ln -s ../${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME} ${vPKG_NAME}
