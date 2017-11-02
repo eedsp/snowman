@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 _OS_NAME=`uname -s`
 
@@ -69,9 +69,8 @@ func_mkdir() {
 func_prepare_file() {
     local vFILE=${1}
     local vEXDIR=${2}
-    local vRET=0
     local vEXT=${vFILE##*.} 
-
+    local vRET=0
 # FILE="example.tar.gz"
 # echo "${FILE%%.*}"
 # example
@@ -199,7 +198,7 @@ func_link() {
                 log_msg "[CMD] rm -rf ${_PKG_NAME_}"
                 rm -rf "${_PKG_NAME_}"
             else
-                log_msg "[INFO] ${_PKG_NAME_}: No such file or directory; Create a new symbolic link"
+                log_msg "[INFO] ${_PKG_NAME_}: Create a new symbolic link"
             fi
 
             local xSRC="../${_APP_FRAMEWORK_PATH_}/${_pNAME}"
@@ -300,7 +299,9 @@ func_build() {
         log_msg "[INFO] <<<< ${_xFILE_PATH}"
     fi
 
-    func_link ${_xNAME}
+    if [ $? ]; then
+        func_link ${_xNAME}
+    fi
 }
 
 # #############################################################################
