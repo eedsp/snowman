@@ -80,7 +80,7 @@ or
 % export PATH=${PATH}:${APP_PREFIX}/bin
 ```
 
-- add ${APP_PREFIX}/lib to the `LD_LIBRARY_PATH` environment variable
+- add ${APP_PREFIX}/lib to the `LD_LIBRARY_PATH` environment variable (for linux)
 ```shell
 % export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:${APP_PREFIX}/lib
 ```
