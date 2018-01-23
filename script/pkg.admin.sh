@@ -28,6 +28,10 @@ _FOLDER_LIST=(
     "include"
     "man"
     "share"
+    "cmake"
+    "etc"
+    "examples"
+    "python"
 )
 
 _SKIP_LIST=(
