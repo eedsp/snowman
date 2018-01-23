@@ -53,7 +53,9 @@ or
 
 ```shell
 % cd ${PKG_BUILD_PATH}/script
-% vi pkg.listr.conf         # edit for package version
+
+% vi pkg.list.conf         # edit for package version
+
 % ./pkg.admin.sh reset      # clean up ${APP_PREFIX}/{bin, lib, include}
 % ./pkg.admin.sh opt        # create symbolic link for ${APP_PREFIX}/opt
 % ./pkg.admin.sh pkg        # create symbolic link for ${APP_PREFIX}/{bin, lib, include}
