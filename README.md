@@ -32,7 +32,7 @@ Setting the environment variable for package to be installed:
 
 % ${PKG_BUILD_PATH}/script/pkg.build.sh cmake-3.10.2.conf
 
-% cd $${APP_PREFIX}/opt
+% cd ${APP_PREFIX}/opt
 % ls -l cmake
 ```
 
@@ -47,14 +47,16 @@ or
 % cp ${PKG_BUILD_PATH}/packages/cmake-3.10.2.conf
 % ${PKG_BUILD_PATH}/script/pkg.build.sh -f cmake-3.10.2.conf
 
-% cd $${APP_PREFIX}/opt
+% cd ${APP_PREFIX}/opt
 % ls -l cmake
 ```
+
+- create link for ${APP_PREFIX}/{bin, lib, include, ...}
 
 ```shell
 % cd ${PKG_BUILD_PATH}/script
 
-% vi pkg.list.conf         # edit for package version
+% vi pkg.list.conf          # edit for package version:  "cmake/3.10.1" to "cmake/3.10.2"
 
 % ./pkg.admin.sh reset      # clean up ${APP_PREFIX}/{bin, lib, include}
 % ./pkg.admin.sh opt        # create symbolic link for ${APP_PREFIX}/opt
