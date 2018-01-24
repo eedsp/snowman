@@ -34,6 +34,10 @@ Setting the environment variable for package to be installed:
 
 % cd ${APP_PREFIX}/opt
 % ls -l cmake
+
+% ls -l ${PKG_BUILD_PATH}/var/tmp
+% rm -rf ${PKG_BUILD_PATH}/var/tmp/cmake-3.10.2   # Clean up the temporary folder.
+
 ```
 
 or
