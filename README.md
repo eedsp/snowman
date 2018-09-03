@@ -11,7 +11,7 @@ Setting the 'snowman' environment variable
 ```shell
 git clone https://github.com/eedsp/snowman.git
 
-xport PKG_BUILD_PATH=${HOME}/snowman
+export PKG_BUILD_PATH=${HOME}/snowman
 export PKG_BUILD_SOURCE_PATH=${HOME}/download
 ```
 
