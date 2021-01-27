@@ -1,8 +1,10 @@
 pkg_info() {
 	_xDESC="ICU"
 
-    _xVER_=67.1
-    _xVER_S=67_1
+    _xM=68
+    _xS=2
+    _xVER_=${_xM}.${_xS}
+    _xVER_S=${_xM}_${_xS}
     _xPKG_NAME_=icu4c
 
 	_xFILE="icu4c-${_xVER_S}-src.tgz"
