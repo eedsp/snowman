@@ -149,26 +149,27 @@ func_check_install_path() {
 
 func_pkgconfig()
 {
-    local _pPKG_LIST=${@}
+    local _pPKG_LIST=("${!1}")
     local _pPATH_LIST=(
         "/usr/local/opt"
         "${_PKG_OPT_PATH_}"
     )
 
     local _PKG_CONFIG_PATH_
-
-    for PKG_CONFIG_prefix in ${_pPATH_LIST[@]}
-    do
-        for vPKG_NAME in  ${_pPKG_LIST[@]}
-        do
-            local _NEW_PATH="${PKG_CONFIG_prefix}/${vPKG_NAME}/lib/pkgconfig"
-            if [ -e "${_NEW_PATH}" ]; then
-                if [ -z "${_PKG_CONFIG_PATH_}" ]; then
-                    _PKG_CONFIG_PATH_=${_NEW_PATH}
-                    break
-                else
-                    _PKG_CONFIG_PATH_+=:${_NEW_PATH}
-                    break
+    
+    for vPKG_NAME in ${_pPKG_LIST[@]}; do
+        for PKG_CONFIG_prefix in ${_pPATH_LIST[@]}; do
+            local _pkgconfig_SUFFIX="${vPKG_NAME}/lib/pkgconfig"
+            local _NEW_PATH="${PKG_CONFIG_prefix}/${_pkgconfig_SUFFIX}"
+            if [ -n "${PKG_CONFIG_PATH##*${_pkgconfig_SUFFIX}*}" ] ;then
+                if [ -e "${_NEW_PATH}" ]; then
+                    if [ -z "${_PKG_CONFIG_PATH_}" ]; then
+                        _PKG_CONFIG_PATH_=${_NEW_PATH}
+                    else
+                        if [ -n "${_PKG_CONFIG_PATH_##*${_pkgconfig_SUFFIX}*}" ]; then
+                            _PKG_CONFIG_PATH_+=:${_NEW_PATH}
+                        fi
+                    fi
                 fi
             fi
         done
@@ -351,8 +352,7 @@ if [ ${#@} -ne 0 ]; then
     [ "$1" = "--" ] && shift
 
     if [ $opt_build_only -eq 0 ]; then
-        for x in ${@}
-        do
+        for x in ${@}; do
             log_msg "[INFO] $x"
             xPKG_LIST+=( ${x} )
         done
@@ -361,8 +361,7 @@ if [ ${#@} -ne 0 ]; then
     func_config
     log_msg "[INFO] \${_PKG_INSTALL_PREFIX_}: ${_PKG_INSTALL_PREFIX_}"
 
-    for xPKG_NAME in ${xPKG_LIST[@]}
-    do
+    for xPKG_NAME in ${xPKG_LIST[@]}; do
         if [ -n "${xPKG_NAME}" ] && [ -n "${_BUILD_PATH_}" ]; then
             log_msg "[INFO] Package: ${xPKG_NAME}"
             func_build ${opt_build_only} ${xPKG_NAME}
