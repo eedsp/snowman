@@ -2,7 +2,8 @@
 
 _OS_NAME=`uname -s`
 
-_APP_FRAMEWORK_PATH_="Frameworks/app.Framework"
+#_APP_FRAMEWORK_PATH_="Frameworks/app.Framework"
+_APP_FRAMEWORK_PATH_="Framework"
 _PKG_LIST_FILE=pkg.list.conf
 
 export PATH=/usr/bin:/bin:${PATH}
@@ -56,14 +57,14 @@ _SKIP_LIST=(
 # gz
 
 proc_config() {
-    _PKG_INSTALL_PREFIX_=${APP_PREFIX}/${_APP_FRAMEWORK_PATH_}
-    _PKG_OPT_PATH_="${APP_PREFIX}/opt"
+    _APP_INSTALL_PREFIX_=${APP_PREFIX}/${_APP_FRAMEWORK_PATH_}
+    _APP_OPT_PATH_="${APP_PREFIX}/opt"
 }
 
 proc_symlink() {
-    for vFILES in $(/bin/ls -c1 ${_PKG_OPT_PATH_})
+    for vFILES in $(/bin/ls -c1 ${_APP_OPT_PATH_})
     do
-        local vFILE="${_PKG_OPT_PATH_}/${vFILES}"
+        local vFILE="${_APP_OPT_PATH_}/${vFILES}"
         if [ -n "${vFILE}" ] && [ -L "${vFILE}" ] ; then
             if [ ! -e "${vFILE}" ] ; then
                 log_msg "[ERROR] ${vFILE} exists and is not a symlink"
@@ -87,17 +88,17 @@ proc_opt() {
 
     log_msg "[INFO] ${xPKG_NAME}"
 
-    if [ -n "${_xPKG_NAME}" ] && [ -n "${vPKG_NAME}" ] && [ -e "${_PKG_OPT_PATH_}" ]; then
-        cd ${_PKG_OPT_PATH_} && (
+    if [ -n "${_xPKG_NAME}" ] && [ -n "${vPKG_NAME}" ] && [ -e "${_APP_OPT_PATH_}" ]; then
+        cd ${_APP_OPT_PATH_} && (
             if [ -n "${vPKG_NAME}" ] && [ -e "./${vPKG_NAME}" ]; then
-                #log_msg "[CMD] rm -rf ./${vPKG_NAME}"
+                log_msg "[CMD] rm -rf ./${vPKG_NAME}"
                 rm -rf "./${vPKG_NAME}"
             else
                 log_msg "[INFO] ./${vPKG_NAME}: No such file or directory; Create a new symbolic link"
             fi
 
             if [ -e "../${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME}" ] && [ ! -e "./${vPKG_NAME}" ]; then
-                #log_msg "[CMD] ln -s ../${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME} ${vPKG_NAME}"
+                log_msg "[CMD] ln -s ../${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME} ${vPKG_NAME}"
                 ln -s ../${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME} ${vPKG_NAME}
             else
                 log_msg "[WARN] ../${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME}: No such file or directory: SKIP"
@@ -111,11 +112,11 @@ proc_link() {
     local xPKG_CMD="${2}"
     local xPKG_NAME="${3}"
     local _xPKG_NAME=$(func_pkg_name ${xPKG_NAME})
-    local _PREFIX_="${_PKG_INSTALL_PREFIX_}/${_xPKG_NAME}"
+    local _PREFIX_="${_APP_INSTALL_PREFIX_}/${_xPKG_NAME}"
 
     log_msg "[INFO] ${xPKG_NAME} "
 
-    if [ -n "${_xPKG_NAME}" ] && [ -e "${_PKG_INSTALL_PREFIX_}" ] && 
+    if [ -n "${_xPKG_NAME}" ] && [ -e "${_APP_INSTALL_PREFIX_}" ] && 
        [ -n "${APP_PREFIX}" ] && [ -e "${APP_PREFIX}" ] && 
        [ -n "${_PREFIX_}" ] && [ -e "${_PREFIX_}" ]; then
 
@@ -192,7 +193,7 @@ proc_link() {
             local vFILE=${vTMP_FILE##*/}
 
             #local vSRC_FILE="${APP_PREFIX}/${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME}/${vTMP_FILE}"
-            local vSRC_FILE="${_PKG_INSTALL_PREFIX_}/${_xPKG_NAME}/${vTMP_FILE}"
+            local vSRC_FILE="${_APP_INSTALL_PREFIX_}/${_xPKG_NAME}/${vTMP_FILE}"
 
             if [ -n "${vPATH}" ] && [ -e "${vPATH}" ] && [ -e "${APP_PREFIX}/${vPATH}" ]; then
             (
@@ -259,11 +260,11 @@ proc_bin() {
     local xPKG_CMD="${1}"
     local xPKG_NAME="${2}"
     local _xPKG_NAME=$(func_pkg_name ${xPKG_NAME})
-    local _PREFIX_="${_PKG_INSTALL_PREFIX_}/${_xPKG_NAME}"
+    local _PREFIX_="${_APP_INSTALL_PREFIX_}/${_xPKG_NAME}"
 
     log_msg "[INFO] ${xPKG_NAME}"
 
-    if [ -n "${_xPKG_NAME}" ] && [ -e "${_PKG_INSTALL_PREFIX_}" ] && 
+    if [ -n "${_xPKG_NAME}" ] && [ -e "${_APP_INSTALL_PREFIX_}" ] && 
        [ -n "${APP_PREFIX}" ] && [ -e "${APP_PREFIX}" ] && 
        [ -n "${_PREFIX_}" ] && [ -e "${_PREFIX_}" ]; then
 
@@ -314,7 +315,7 @@ proc_bin() {
             local vFILE=${vTMP_FILE##*/}
 
             #local vSRC_FILE="${APP_PREFIX}/${_APP_FRAMEWORK_PATH_}/${_xPKG_NAME}/${vTMP_FILE}"
-            local vSRC_FILE="${_PKG_INSTALL_PREFIX_}/${_xPKG_NAME}/${vTMP_FILE}"
+            local vSRC_FILE="${_APP_INSTALL_PREFIX_}/${_xPKG_NAME}/${vTMP_FILE}"
 
             if [ -n "${vPATH}" ] && [ -e "${vPATH}" ]; then
             (

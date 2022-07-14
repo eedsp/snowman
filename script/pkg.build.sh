@@ -2,7 +2,8 @@
 
 _OS_NAME=`uname -s`
 
-_APP_FRAMEWORK_PATH_="Frameworks/app.Framework"
+#_APP_FRAMEWORK_PATH_="Frameworks/app.Framework"
+_APP_FRAMEWORK_PATH_="Framework"
 
 export PATH=/usr/bin:/bin:${PATH}
 
