@@ -2,7 +2,6 @@
 
 _OS_NAME=`uname -s`
 
-#_APP_FRAMEWORK_PATH_="Frameworks/app.Framework"
 _APP_FRAMEWORK_PATH_="Framework"
 _PKG_LIST_FILE=pkg.list.conf
 
