@@ -276,8 +276,8 @@ func_build() {
     #log_msg "[INFO] _BUILD_OPT   : ${_BUILD_OPT}"
     if [ ${_BUILD_OPT} -eq 0 ]; then
 
-        log_msg "[INFO] find ${_SOURCE_PATH_} -name ${_xFILE} -print | head -n 1"
-        local _xSRC_FILE=$(find ${_SOURCE_PATH_} -name ${_xFILE} -print | head -n 1)
+        log_msg "[INFO] find ${_SOURCE_PATH_}/ -name ${_xFILE} -print | head -n 1"
+        local _xSRC_FILE=$(find "${_SOURCE_PATH_}/" -name ${_xFILE} -print | head -n 1)
         log_msg "[INFO] ${_xSRC_FILE}"
         if [ -n "${_xSRC_FILE}" ]; then
             func_prepare_file "${_xSRC_FILE}" "${_BUILD_PATH_}"
